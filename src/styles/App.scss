@@ -1,0 +1,63 @@
+/* Base Application Styles */
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: #222;
+}
+#app {
+  width: 100%;
+  height: 100%;
+}
+.content {
+  width: 100%;
+  height: 100%;
+}
+img {
+  width: 375px;
+  height: 300px;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.img-sec {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #bbb;
+
+  @at-root {
+    .img-figure {
+      position: absolute;
+      width: 415px;
+      margin: 0;
+      padding:  20px;
+      background-color: #fff;
+      box-sizing: border-box;
+    }
+
+    figcaption {
+      text-align: center;
+      .img-title {
+        margin: 20px 0 0 0;
+        color: #a7a0a2;
+        font-size: 16px;
+      }
+    }
+
+  }
+}
+
+
+.controller-nav {
+  position: absolute;
+  left: 0;
+  bottom: 30px;
+  z-index: 101;
+  width: 100%;
+  text-align: center;
+}
