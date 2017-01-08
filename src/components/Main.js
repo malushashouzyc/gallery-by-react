@@ -26,6 +26,33 @@ function get30DegRandom() {
 	return ((Math.random() > 0.5 ? '' : '-') + Math.ceil(Math.random()*30))
 }
 
+let ControllerUnit = React.createClass({
+	handleClick (e) {
+		if (this.props.arrage.isCenter) {
+			this.props.inverse();
+		} else {
+			this.props.center();
+		}
+		e.stopPropagation();
+		e.preventDefault();
+	},
+
+	render () {
+		let controllerUnitClassName = "controller-unit";
+
+		if (this.props.arrage.isCenter) {
+			controllerUnitClassName += " is-center";
+
+			if (this.props.arrage.isInverse) {
+				controllerUnitClassName += " is-inverse";
+			}
+		}
+		return (
+			<span className={controllerUnitClassName} onClick={(e)=>{this.handleClick(e)}}></span>
+		)
+	}
+})
+
 let ImgFigure = React.createClass({
 	handleClick (e) {
 
@@ -64,7 +91,11 @@ let ImgFigure = React.createClass({
                 <img src={this.props.data.imageURL} alt={this.props.data.title}/>
                 <figcaption>
                     <h2>{this.props.data.title}</h2>
-                    <div className="img-back" onClick={this.handleClick}></div>
+                    <div className="img-back" onClick={this.handleClick}>
+                    	<p>
+			              {this.props.data.title}
+			            </p>
+                    </div>
                 </figcaption>
             </figure>
         )
@@ -125,7 +156,7 @@ class AppComponent extends React.Component {
 			vPosRangeX = vPosRange.x,
 
 			imgsArrangeTopArr = [],
-			topImgNum = Math.ceil(Math.random() * 2),
+			topImgNum = Math.floor(Math.random() * 2),
 			topImgSpliceIndex = 0,
 			imgsArrangeCenterArr = imgsArrangeArr.splice(centerIndex, 1);
 
@@ -167,6 +198,7 @@ class AppComponent extends React.Component {
 					isCenter: false
 				}
 			}
+
 
 			if (imgsArrangeTopArr && imgsArrangeTopArr[0]) {
 				imgsArrangeArr.splice(topImgSpliceIndex, 0, imgsArrangeTopArr[0]);
@@ -236,7 +268,13 @@ class AppComponent extends React.Component {
             imgFigures.push(<ImgFigure data={value} ref={'imgFigure' + index} 
             	arrage={_this.state.imgsArrangeArr[index]} 
             	inverse={this.inverse(index)} 
-            	center={this.center(index)}/>);
+            	center={this.center(index)}
+            />);
+
+            controllerUnits.push(<ControllerUnit arrage={this.state.imgsArrangeArr[index]} 
+            	inverse={this.inverse(index)} 
+            	center={this.center(index)}
+            />);
         }.bind(this))
 
         return (
