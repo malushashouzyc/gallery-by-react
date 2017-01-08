@@ -22,17 +22,49 @@ function getRangeRandom(low, high) {
 	return Math.ceil(Math.random() * (high - low) + low);
 }
 
+function get30DegRandom() {
+	return ((Math.random() > 0.5 ? '' : '-') + Math.ceil(Math.random()*30))
+}
+
 let ImgFigure = React.createClass({
+	handleClick (e) {
+
+		if (this.props.arrage.isCenter) {
+			this.props.inverse();
+		} else {
+			this.props.center();
+		}
+
+		e.stopPropagation();
+		e.preventDefault();
+	},
+
     render () {
     	let styleObj = {};
+
     	if (this.props.arrage.pos) {
     		styleObj = this.props.arrage.pos;
     	}
+
+    	if (this.props.arrage.rotate) {
+    		(['-moz-', '-ms-', '-webkit-', '']).forEach(function () {
+    			styleObj['transform'] = 'rotate(' + this.props.arrage.rotate + 'deg)';
+    		}.bind(this));
+    	}
+
+    	if (this.props.arrage.isCenter) {
+    		styleObj.zIndex = 11;
+    	}
+
+    	let imgFigureClassName = "img-figure";
+    	imgFigureClassName += this.props.arrage.isInverse ? ' is-inverse' : '';
+
         return (
-            <figure className="img-figure" style={styleObj}>
+            <figure className={imgFigureClassName} style={styleObj} onClick={(e)=>{this.handleClick(e)}}>
                 <img src={this.props.data.imageURL} alt={this.props.data.title}/>
                 <figcaption>
                     <h2>{this.props.data.title}</h2>
+                    <div className="img-back" onClick={this.handleClick}></div>
                 </figcaption>
             </figure>
         )
@@ -45,6 +77,13 @@ class AppComponent extends React.Component {
 
 		]
 	}
+
+	center (index) {
+		return function () {
+			this.rerrange(index);
+		}.bind(this);
+	}
+
 	Constant = {
 		centerPos: {
 			left: 0,
@@ -58,6 +97,18 @@ class AppComponent extends React.Component {
 		vPosRange: {
 			x: [0, 0],
 			topY: [0, 0]
+		}
+	}
+
+	inverse (index) {
+		return  () => {
+			let imgsArrangeArr = this.state.imgsArrangeArr;
+
+			imgsArrangeArr[index].isInverse = !imgsArrangeArr[index].isInverse;
+
+			this.setState({
+				imgsArrangeArr: imgsArrangeArr
+			});
 		}
 	}
 
@@ -78,15 +129,23 @@ class AppComponent extends React.Component {
 			topImgSpliceIndex = 0,
 			imgsArrangeCenterArr = imgsArrangeArr.splice(centerIndex, 1);
 
-			imgsArrangeCenterArr[0].pos = centerPos;
+			imgsArrangeCenterArr[0] = {
+				pos: centerPos,
+				rotate: 0,
+				isCenter: true
+			}
 
 			topImgSpliceIndex = Math.ceil(Math.random() * (imgsArrangeArr.length - topImgNum));
 			imgsArrangeTopArr = imgsArrangeArr.splice(topImgSpliceIndex, topImgNum);
 
 			imgsArrangeTopArr.forEach(function (value, index) {
-				imgsArrangeTopArr[index].pos = {
-					top: getRangeRandom(vPosRangeTopY[0], vPosRangeTopY[1]),
-					left: getRangeRandom(vPosRangeX[0], vPosRangeX[1])
+				imgsArrangeTopArr[index]= {
+					pos: {
+						top: getRangeRandom(vPosRangeTopY[0], vPosRangeTopY[1]),
+						left: getRangeRandom(vPosRangeX[0], vPosRangeX[1])
+					},
+					rotate: get30DegRandom(),
+					isCenter: false
 				}
 			})
 
@@ -99,9 +158,13 @@ class AppComponent extends React.Component {
 					hPosRangeLORX = hPosRangeRightSecX;
 				}
 
-				imgsArrangeArr[i].pos = {
-					top: getRangeRandom(hPosRangeY[0], hPosRangeY[1]),
-					left: getRangeRandom(hPosRangeLORX[0], hPosRangeLORX[1])
+				imgsArrangeArr[i] = {
+					pos: {
+						top: getRangeRandom(hPosRangeY[0], hPosRangeY[1]),
+						left: getRangeRandom(hPosRangeLORX[0], hPosRangeLORX[1])
+					},
+					rotate: get30DegRandom(),
+					isCenter: false
 				}
 			}
 
@@ -118,7 +181,6 @@ class AppComponent extends React.Component {
 
 	componentDidMount () {
 		let _this = this;
-		console.log(this);
 		
 		let stageDOM = ReactDom.findDOMNode(_this.refs.stage),
 		    stageW = stageDOM.scrollWidth,
@@ -164,12 +226,18 @@ class AppComponent extends React.Component {
         			pos: {
         				left: 0,
         				top: 0
-        			}
+        			},
+        			rotate: 0,
+        			isInverse: false,
+        			isCenter: false
         		}
         	}
 
-            imgFigures.push(<ImgFigure data={value} ref={'imgFigure' + index} arrage={_this.state.imgsArrangeArr[index]}/>)
-        })
+            imgFigures.push(<ImgFigure data={value} ref={'imgFigure' + index} 
+            	arrage={_this.state.imgsArrangeArr[index]} 
+            	inverse={this.inverse(index)} 
+            	center={this.center(index)}/>);
+        }.bind(this))
 
         return (
             <section className="stage" ref="stage">

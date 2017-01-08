@@ -29,6 +29,7 @@ img {
   height: 100%;
   overflow: hidden;
   background-color: #bbb;
+  perspective: 1800px;
 
   @at-root {
     .img-figure {
@@ -38,8 +39,27 @@ img {
       padding:  20px;
       background-color: #fff;
       box-sizing: border-box;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      transition: transform .6s ease-in-out, left .6s ease-in-out, top .6s ease-in-out;
+      transform-origin: 0 50% 0;
+      &.is-inverse {
+        transform: translate(415px) rotateY(180deg);
+      }
     }
-
+    /*.img-back {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      padding: 30px;
+      box-sizing: border-box;
+      text-align: center;
+      color: #666;
+      transform: rotateY(180deg);
+      background: #fff;
+    }*/
     figcaption {
       text-align: center;
       .img-title {
@@ -47,6 +67,7 @@ img {
         color: #a7a0a2;
         font-size: 16px;
       }
+      
     }
 
   }
